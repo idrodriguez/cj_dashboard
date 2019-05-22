@@ -1,0 +1,43 @@
+{% extends "bootstrap/base.html" %}
+{% block title %} ACL Dashboard {% endblock %}
+
+{% block head %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+<script src="https://js.pusher.com/4.4/pusher.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart" id="bargraph">
+                <script type="text/javascript">
+                    // Layout configuration
+                    var layout = {
+                        title: 'Technical Debt per Sprint',
+                        xaxis: { title: 'Sprint'},
+                        yaxis: { 
+                            title: 'Number of Technical Debt Issues'
+                        }
+                    };
+                    var techDebtIssues = {{techDebtIssues | safe}};
+                    Plotly.plot('bargraph', techDebtIssues, layout, {responsive: true});
+
+                    // connect to Pusher
+                    const pusher = new Pusher('pusher_key', {
+                        cluster: 'eu',
+                        forceTLS: true
+                    });
+                    // Subscribe to your channel
+                    const channel = pusher.subscribe('tech_debt')
+                    // listen for relevant events
+                    channel.bind('job', data => {
+                        Plotly.newPlot('bargraph', data, layout, {responsive: true});
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

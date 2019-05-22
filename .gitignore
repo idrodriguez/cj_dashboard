@@ -1,0 +1,5 @@
+.vscode/
+env/
+dev.env
+prod.env
+cj_dashboard/__pycache__/
