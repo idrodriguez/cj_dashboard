@@ -33,6 +33,10 @@ pusher_client = pusher.Pusher(
 def index():
     return render_template('dashboard.html', techDebtIssues = get_sprint_with_tech_debt())
 
+@app.route('/idle_pbi')
+def idlepbi():
+    return render_template('pbi_idling.html', idlePBI = get_pbi_idle_current_sprint())
+
 # Functions
 def get_http_jira_client():
     jira_URL = env('JIRA_SERVER')
@@ -56,6 +60,24 @@ def get_tech_debt_issues():
         tech_debt_issues.append([issue.key, sprint_name])
 
     return tech_debt_issues
+
+def get_pbi_inprogress_current_sprint():
+    jira_pbi_current_sprint = jira_client.search_issues('Team in (CustomerJourney) AND Sprint in openSprints() AND issuetype in (Story, Task, Bug) AND status = Implementing')
+    jira_pbi_current_sprint_list = []
+
+    for issue in jira_pbi_current_sprint:
+        jira_pbi_current_sprint_list.append([issue.key, issue.fields.summary])
+
+    return jira_pbi_current_sprint
+
+def get_pbi_idle_current_sprint():
+    jira_pbi_current_sprint = get_pbi_inprogress_current_sprint()
+    pbi_idle = []
+    for issue in jira_pbi_current_sprint:
+        issues = jira_client.search_issues('parent = ' + issue.key + ' and status = Implementing')
+        if issues.total == 0:
+            pbi_idle.append({'key': issue.key, 'summary':  issue.fields.summary})
+    return pbi_idle
 
 def get_sprint_with_tech_debt():
     # Fetch the data from JIRA

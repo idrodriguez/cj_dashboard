@@ -1,0 +1,19 @@
+{% extends "bootstrap/base.html" %}
+{% block title %} PBIs Idling Dashboard {% endblock %}
+
+{% block head %}
+<script src="https://js.pusher.com/4.4/pusher.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>List of Idling for Current Sprint:</h2>
+        <div class="list-group">
+            {% for issue in idlePBI %}
+                <a href="https://jira.bestsecret.com/browse/{{ issue.key }}" class="list-group-item">{{ issue.key }}</a> : {{ issue.summary }}</div></li>
+            {% else %}
+                <h3>Good!!! You dont have any idle PBI</h3>
+            {% endfor %}
+        </div>
+</div>
+{% endblock %}
